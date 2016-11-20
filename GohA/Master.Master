@@ -1,0 +1,41 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Master.master.cs" Inherits="Assignment1.Master" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+
+    <link href="styles/reset.css" rel="stylesheet" />
+    <link href="styles/master.css" rel="stylesheet" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <div id="dvBodyHolder">
+
+        <div id="dvHeaderHolder">
+            <div id="dvMenuHolder">
+                <a href="../Home.aspx"><span class="menuButton">Home</span></a>
+                <a href="../Recipes.aspx"><span class="menuButton">Recipes</span></a>
+                <a href="../AddRecipe.aspx"><span class="menuButton">Add Recipe</span></a>
+                <a href="../Search.aspx"><span class="menuButton">Search</span></a>
+                <a href="../Setup.aspx"><span class="menuButton rightButton">Setup</span></a>
+            </div>
+        </div>
+
+        <div id="dvInnerBody" style="margin: 15px">
+
+            <form id="form1" runat="server">
+            <div>
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        
+                </asp:ContentPlaceHolder>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
