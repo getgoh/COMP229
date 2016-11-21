@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Al Roben Adriane Goh - 300910584
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +17,7 @@ namespace Assignment1
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            //List<Recipe> RecipeList = (List<Recipe>)Application["RecipeList"];
+            // Al Roben Adriane Goh - 300910584
             List<Recipe> RecipeList = new DataManager().getRecipeList();
 
             foreach (Recipe recipe in RecipeList)
@@ -24,8 +26,11 @@ namespace Assignment1
                 ((WUCRecipe)tempControl).Name = recipe.Name;
                 ((WUCRecipe)tempControl).SubmittedBy = recipe.SubmittedBy;
                 ((WUCRecipe)tempControl).PrepareTime = recipe.CookingTime;
+                ((WUCRecipe)tempControl)._linkRecipeName.HRef = "../RecipeDetails.aspx?recipeID=" + recipe.Id;
                 phRecipes.Controls.Add(tempControl);
             }
         }
     }
 }
+
+// Al Roben Adriane Goh - 300910584

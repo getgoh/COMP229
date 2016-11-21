@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 public partial class WUCRecipe : System.Web.UI.UserControl
@@ -13,6 +14,10 @@ public partial class WUCRecipe : System.Web.UI.UserControl
     }
 
 
+    public HtmlAnchor _linkRecipeName
+    {
+        get { return this.linkRecipeName; }
+    }
 
     public string Name
     {

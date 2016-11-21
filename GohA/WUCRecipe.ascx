@@ -1,6 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="WUCRecipe.ascx.cs" Inherits="WUCRecipe" %>
 <div>
-    <asp:Label ID="txtName" Text="text" runat="server" />
+    <a id="linkRecipeName" runat="server"><asp:Label ID="txtName" Text="text" runat="server" /></a>
     <br /><br />
     <asp:Label ID="txtSubmitted" Text="text" runat="server" />
     <br /><br />

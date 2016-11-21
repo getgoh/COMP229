@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Al Roben Adriane Goh - 300910584
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -17,6 +19,8 @@ public partial class Setup : System.Web.UI.Page
 
     }
 
+    // Al Roben Adriane Goh - 300910584
+
     protected void btnLight_Click(object sender, EventArgs e)
     {
         Application["CurrentTheme"] = "Light";
@@ -29,3 +33,5 @@ public partial class Setup : System.Web.UI.Page
         Response.Redirect("Setup.aspx");
     }
 }
+
+// Al Roben Adriane Goh - 300910584

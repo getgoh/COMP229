@@ -1,4 +1,6 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeFile="AddRecipe.aspx.cs" Inherits="Assignment1.AddRecipe" %>
+﻿<%-- Al Roben Adriane Goh - 300910584--%>
+
+<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeFile="AddRecipe.aspx.cs" Inherits="Assignment1.AddRecipe" %>
 
 <%@ Register Src="~/WUCIngredients.ascx" TagPrefix="uc1" TagName="WUCIngredients" %>
 
@@ -13,7 +15,7 @@
         <div class="buttonsHolder">
             <asp:Button ID="btnSubmit" Width="150" Height="40" Font-Size="Medium" Text="Save" runat="server" OnClick="btnSubmit_Click" />
             <asp:Button ID="btnCancel" Width="150" Height="40" Font-Size="Medium" Text="Cancel" runat="server" OnClick="btnCancel_Click" CausesValidation="False" />
-            <asp:Button ID="btnAddIngredient" CssClass="lm30" Width="150" Height="40" Font-Size="Medium" Text="Add Ingredient" runat="server" CausesValidation="False" OnClick="btnAddIngredient_Click" />
+            <asp:Button ID="btnAddIngredient" CssClass="lm30" Width="150" Height="40" Font-Size="Medium" Text="Add Ingredient" runat="server" CausesValidation="False" OnClick="btnAddIngredient_Click" UseSubmitBehavior="False" />
             
         </div>
         <hr />
@@ -45,6 +47,8 @@
                         <br />  
                     </li>
         
+    <%-- Al Roben Adriane Goh - 300910584--%>
+
                     <li class="style-1">
                         <asp:Label ID="lblCookingTime" runat="server" Text="Prepare/cooking time: "></asp:Label>
                         <br />
@@ -93,3 +97,5 @@
         </div>
     </div>
 </asp:Content>
+
+<%-- Al Roben Adriane Goh - 300910584--%>

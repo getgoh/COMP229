@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Al Roben Adriane Goh - 300910584
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,14 +18,37 @@ namespace Assignment1
             Page.Theme = Application["CurrentTheme"].ToString();
         }
 
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            //ingList = new List<Control>();
+            //initiateIngredientInputs(3);
+            //showIngredientInputs();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!Page.IsPostBack)
+            if (!Page.IsPostBack)
             {
                 ingList = new List<Control>();
-                initiateIngredientInputs(5);
-                showIngredientInputs();
-            }            
+                initiateIngredientInputs(3);
+                //showIngredientInputs();
+            }
+
+            showIngredientInputs();
+
+            //Response.Write("<script type='text/javascript'> alert('page load!'); </script>");
+
+            //setTestValues();
+        }
+
+        private void setTestValues()
+        {
+            txtName.Text = "Adobo Test";
+            txtDescription.Text = "Sample desc test";
+            txtCookingTime.Text = "24";
+            txtCategory.Text = "Filipino foods";
+            txtServings.Text = "8";
+            txtSubmitted.Text = "Al Test";
         }
 
         private void initiateIngredientInputs(int num)
@@ -31,6 +56,7 @@ namespace Assignment1
             for(int x = 1; x <= num; x++)
             {                
                 Control tempControl = LoadControl("WUCIngredients.ascx");
+                ((WUCIngredients)tempControl).ID = "WUCIngredient" + x;
                 ((WUCIngredients)tempControl)._txtName.ID = "ingName" + x;
                 ((WUCIngredients)tempControl)._txtQuantity.ID = "ingQuantity" + x;
                 ((WUCIngredients)tempControl)._txtUnit.ID = "ingUnit" + x;
@@ -40,12 +66,32 @@ namespace Assignment1
             Session["ingList"] = ingList;
         }
 
+        // Al Roben Adriane Goh - 300910584
+
+        private List<string> UWCIngIdCollection
+        {
+            get
+            {
+                var collection = ViewState["UWCIngIdCollection"] as List<string>;
+                return collection ?? new List<string>();
+            }
+            set { ViewState["UWCIngIdCollection"] = value; }
+        }
+
         private void showIngredientInputs()
         {
             phIngredients.Controls.Clear();
-            foreach (Control tempControl in ingList)
+            int x = 1;
+            foreach (Control tempControl in ((List<Control>)Session["ingList"]))
             {
+                ((WUCIngredients)tempControl).ID = "WUCIngredient" + x;
+                ((WUCIngredients)tempControl)._txtName.ID = "ingName" + x;
+                ((WUCIngredients)tempControl)._txtQuantity.ID = "ingQuantity" + x;
+                ((WUCIngredients)tempControl)._txtUnit.ID = "ingUnit" + x;
+
                 phIngredients.Controls.Add(tempControl);
+
+                x++;
             }
         }
 
@@ -68,8 +114,8 @@ namespace Assignment1
                 Response.Write("<script type='text/javascript'> alert('" + new DataManager().insertNewRecipe(newRecipe) + "'); </script>");
 
                 //((List<Recipe>)Application["RecipeList"]).Add(newRecipe);
-
-                //Response.Redirect("RecipeAdded.aspx");
+                                
+                Response.Redirect("Success.aspx?type=add");
             }
         }
         
@@ -78,11 +124,17 @@ namespace Assignment1
         {
             List<Ingredient> IngredientList = new List<Ingredient>();
 
-            foreach(Control tempControl in phIngredients.Controls)
+            ControlCollection cList = phIngredients.Controls;
+
+            List<Control> iList = (List<Control>)Session["ingList"];
+
+            //foreach(Control tempControl in iList)
+            foreach (Control tempControl in phIngredients.Controls)
             {
                 IngredientList.Add(new Ingredient() { Name = ((WUCIngredients)tempControl).Name, Quantity = ((WUCIngredients)tempControl).Quantity, Unit = ((WUCIngredients)tempControl).Unit });
             }
 
+            /*
             //IngredientList.Add(new Ingredient() { Name = wucIngredient1.Name, Quantity = wucIngredient1.Quantity, Unit = wucIngredient1.Unit });
             //IngredientList.Add(new Ingredient() { Name = wucIngredient2.Name, Quantity = wucIngredient2.Quantity, Unit = wucIngredient2.Unit });
             //IngredientList.Add(new Ingredient() { Name = wucIngredient3.Name, Quantity = wucIngredient3.Quantity, Unit = wucIngredient3.Unit });
@@ -98,6 +150,7 @@ namespace Assignment1
             //IngredientList.Add(new Ingredient() { Name = wucIngredient13.Name, Quantity = wucIngredient13.Quantity, Unit = wucIngredient13.Unit });
             //IngredientList.Add(new Ingredient() { Name = wucIngredient14.Name, Quantity = wucIngredient14.Quantity, Unit = wucIngredient14.Unit });
             //IngredientList.Add(new Ingredient() { Name = wucIngredient15.Name, Quantity = wucIngredient15.Quantity, Unit = wucIngredient15.Unit });
+            */
 
             return IngredientList;
         }
@@ -110,16 +163,19 @@ namespace Assignment1
 
         protected void btnAddIngredient_Click(object sender, EventArgs e)
         {
+            int ctr = ((List<Control>)Session["ingList"]).Count + 1;
+
             Control tempControl = LoadControl("WUCIngredients.ascx");
-            ((WUCIngredients)tempControl)._txtName.ID = "ingName";
-            ((WUCIngredients)tempControl)._txtQuantity.ID = "ingQuantity";
-            ((WUCIngredients)tempControl)._txtUnit.ID = "ingUnit";
+            ((WUCIngredients)tempControl).ID = "WUCIngredient" + ctr;
+            ((WUCIngredients)tempControl)._txtName.ID = "ingName" + ctr;
+            ((WUCIngredients)tempControl)._txtQuantity.ID = "ingQuantity" + ctr;
+            ((WUCIngredients)tempControl)._txtUnit.ID = "ingUnit" + ctr;
 
-            ingList = (List<Control>)Session["ingList"];
-
-            ingList.Add(tempControl);
-
+            ((List<Control>)Session["ingList"]).Add(tempControl);
+            
             showIngredientInputs();
         }
     }
 }
+
+// Al Roben Adriane Goh - 300910584

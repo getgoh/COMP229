@@ -130,3 +130,9 @@ li
 {
     margin-left:30px;
 }
+
+select
+{
+    min-height: 30px;
+    font-family: Arial;
+}

@@ -10,7 +10,8 @@ using System.Data;
 /// </summary>
 public class DataManager
 {
-    private string connString = "DATA SOURCE=oracle1.centennialcollege.ca:1521/SQLD;USER ID=COMP214F16_004_P_39;PASSWORD=password";
+    //private string connString = "DATA SOURCE=oracle1.centennialcollege.ca:1521/SQLD;USER ID=COMP214F16_004_P_39;PASSWORD=password";
+    private string connString = System.Configuration.ConfigurationManager.ConnectionStrings["COMP229OracleCS"].ConnectionString;
     private OracleConnection conn;
     private OracleCommand cmd, ingCmd;
     private OracleDataReader reader;
@@ -108,6 +109,128 @@ public class DataManager
         return RecipeList;
     }
 
+    public List<Recipe> getRecipeBySearchParams(string submittedBy, string category, string ingredient)
+    {
+        List<Recipe> RecipeList = new List<Recipe>();
+
+        conn.Open();
+
+        query = "select * from RB_RECIPE";
+        bool hasFirst = false;
+
+        cmd = new OracleCommand();
+        cmd.Connection = conn;
+
+        if (submittedBy != "All" || category != "All")
+        {
+            query += " where ";
+
+            if(submittedBy != "All")
+            {
+                query += "SUBMITTEDBY= :SB";
+                cmd.Parameters.Add(new OracleParameter("SB", submittedBy));
+                hasFirst = true;
+            }
+            if(category != "All")
+            {
+                query += hasFirst ? " and CATEGORY= :CAT" : "CATEGORY= :CAT";
+                cmd.Parameters.Add(new OracleParameter("CAT", category));
+            }
+        }
+
+        cmd.CommandText = query;
+
+        reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            Recipe r = new Recipe();
+            r.Id = Convert.ToInt32(reader["RECIPEID"].ToString());
+            r.Name = reader["NAME"].ToString();
+            r.SubmittedBy = reader["SUBMITTEDBY"].ToString();
+            r.Category = reader["CATEGORY"].ToString();
+            r.CookingTime = Convert.ToInt32(reader["COOKINGTIME"].ToString());
+            r.Servings = Convert.ToInt32(reader["SERVINGS"].ToString());
+            r.Description = reader["DESCRIPTION"].ToString();
+
+            r.IngredientList = getIngredientsByRecipeID(r.Id);
+
+            RecipeList.Add(r);
+        }
+
+        conn.Close();
+
+        if(ingredient != "All")
+        {
+            RecipeList = RecipeList.Where(a => a.IngredientList.Where(b => b.Name.Equals(ingredient)).Count() > 0).ToList();
+        }
+
+        return RecipeList;
+    }
+
+    public List<string> getIngrendientsNameList()
+    {
+        List<string> IngredientList = new List<string>();
+
+        query = "select distinct NAME from RB_INGREDIENT";
+        
+        conn.Open();
+
+        ingCmd = new OracleCommand(query, conn);
+
+        OracleDataReader ingReader = ingCmd.ExecuteReader();
+
+        if (ingReader == null || !ingReader.HasRows)
+            return IngredientList;
+
+        while (ingReader.Read())
+        {
+            //Ingredient i = new Ingredient();
+            //i.Id = Convert.ToInt32(ingReader["INGREDIENTID"].ToString());
+            //i.Name = ingReader["NAME"].ToString();
+            //i.Quantity = Convert.ToInt32(ingReader["QUANTITY"].ToString());
+            //i.Unit = ingReader["MEASUREUNIT"].ToString();
+
+            IngredientList.Add(ingReader["NAME"].ToString());
+        }
+
+        conn.Close();
+
+        return IngredientList;
+    }
+
+    public Recipe getRecipeById(int recipeId)
+    {
+        Recipe r = null;
+
+        query = "select * from RB_RECIPE where RECIPEID= :recipeId";
+
+        conn.Open();
+
+        cmd = new OracleCommand(query, conn);
+        cmd.Parameters.Add(new OracleParameter("recipeId", recipeId));
+
+        reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            r = new Recipe();
+            r.Id = Convert.ToInt32(reader["RECIPEID"].ToString());
+            r.Name = reader["NAME"].ToString();
+            r.SubmittedBy = reader["SUBMITTEDBY"].ToString();
+            r.Category = reader["CATEGORY"].ToString();
+            r.CookingTime = Convert.ToInt32(reader["COOKINGTIME"].ToString());
+            r.Servings = Convert.ToInt32(reader["SERVINGS"].ToString());
+            r.Description = reader["DESCRIPTION"].ToString();
+
+            r.IngredientList = getIngredientsByRecipeID(r.Id);            
+        }
+
+        conn.Close();
+
+        return r;
+    }
+
     private List<Ingredient> getIngredientsByRecipeID(int recipeId)
     {
         List<Ingredient> IngredientList = new List<Ingredient>();
@@ -119,24 +242,41 @@ public class DataManager
 
         ingCmd = new OracleCommand(query, conn);
 
-        reader = cmd.ExecuteReader();
+        OracleDataReader ingReader = ingCmd.ExecuteReader();
 
-        if (reader == null || !reader.HasRows)
+        if (ingReader == null || !ingReader.HasRows)
             return IngredientList;
 
-        while(reader.Read())
+        while(ingReader.Read())
         {
             Ingredient i = new Ingredient();
-            //i.Id = Convert.ToInt32(reader["INGREDIENTID"].ToString());
-            //i.Id = 234;
-            //i.Name = reader["NAME"].ToString();
-            //i.Quantity = Convert.ToInt32(reader["QUANTITY"].ToString());
-            //i.Unit = reader["MEASUREUNIT"].ToString();
+            i.Id = Convert.ToInt32(ingReader["INGREDIENTID"].ToString());
+            i.Name = ingReader["NAME"].ToString();
+            i.Quantity = Convert.ToInt32(ingReader["QUANTITY"].ToString());
+            i.Unit = ingReader["MEASUREUNIT"].ToString();
 
             IngredientList.Add(i);
         }
 
         return IngredientList;
+    }
+
+   
+
+    public void deleteRecipeById(int recipeId)
+    {
+        // delete recipe, then delete ingredients
+        query = "RB_DELETERECIPE";
+
+        conn.Open();
+        
+        cmd = new OracleCommand(query, conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        
+        cmd.Parameters.Add("LV_RECIPEID", OracleDbType.Int32).Value = recipeId;
+        cmd.ExecuteNonQuery();
+        
+        conn.Close();
     }
 
     public static string SafeGetString(OracleDataReader reader, int colIndex)
