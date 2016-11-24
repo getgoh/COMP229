@@ -109,6 +109,43 @@ public class DataManager
         return RecipeList;
     }
 
+    public void addCategory(string category)
+    {
+        query = "RB_ADDCATEGORY";
+
+        conn.Open();
+
+        cmd = new OracleCommand(query, conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.Add("LV_NAME", OracleDbType.Varchar2).Value = category;
+
+        cmd.ExecuteNonQuery();
+
+        conn.Close();
+    }
+
+    public List<string> getCategories()
+    {
+        List<string> categoryList = new List<string>();
+
+        query = "select * from RB_CATEGORY";
+
+        conn.Open();
+
+        cmd = new OracleCommand(query, conn);
+
+        reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            categoryList.Add(reader["NAME"].ToString());
+        }
+
+        conn.Close();
+
+        return categoryList;
+    }
+
     public List<Recipe> getRecipeBySearchParams(string submittedBy, string category, string ingredient)
     {
         List<Recipe> RecipeList = new List<Recipe>();
@@ -261,7 +298,31 @@ public class DataManager
         return IngredientList;
     }
 
-   
+   public void updateRecipe(Recipe recipe)
+    {
+        query = "RB_UPDATERECIPE";
+
+        conn.Open();
+
+        cmd = new OracleCommand(query, conn);
+
+        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+        cmd.Parameters.Add("LV_ID", OracleDbType.Int32).Value = recipe.Id;
+        cmd.Parameters.Add("LV_NAME", OracleDbType.Varchar2).Value = recipe.Name;
+        cmd.Parameters.Add("LV_CATEGORY", OracleDbType.Varchar2).Value = recipe.Category;
+        cmd.Parameters.Add("LV_COOKINGTIME", OracleDbType.Int32).Value = recipe.CookingTime;
+        cmd.Parameters.Add("LV_SERVINGS", OracleDbType.Int32).Value = recipe.Servings;
+        cmd.Parameters.Add("LV_DESCRIPTION", OracleDbType.Varchar2).Value = recipe.Description;        
+
+        cmd.ExecuteNonQuery();
+
+        insertIngredients(recipe);
+
+        //cmd.ExecuteNonQuery();        
+
+        conn.Close();
+    }
 
     public void deleteRecipeById(int recipeId)
     {

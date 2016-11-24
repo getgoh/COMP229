@@ -13,7 +13,10 @@
     <div class="dvFormHolder">
         
         <div class="buttonsHolder">
-            <asp:Button ID="btnDelete" Width="150" Height="40" Font-Size="Medium" Text="Delete Recipe" ForeColor="White" BackColor="Red" runat="server" OnClick="btnDelete_Click" />
+           <asp:Button ID="btnSave" Width="150" Height="40" Font-Size="Medium" Text="Save Recipe" runat="server" OnClick="btnSave_Click" />
+            <asp:Button ID="btnAddIngredient" CssClass="lm30" Width="150" Height="40" Font-Size="Medium" Text="Add Ingredient" runat="server" CausesValidation="False" OnClick="btnAddIngredient_Click" UseSubmitBehavior="False" />
+           <asp:Button ID="btnDelete" Width="150" Height="40" Font-Size="Medium" Text="Delete Recipe" ForeColor="White" BackColor="Red" runat="server" OnClick="btnDelete_Click" />
+
         </div>
         <hr />
         <div>
@@ -36,10 +39,19 @@
                         <br />
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Please enter author name" ControlToValidate="txtSubmitted" ForeColor="Red" Display="Static"></asp:RequiredFieldValidator>
                     </li>
+
+                    <li class="style-1">
+                        <asp:TextBox  placeholder="add category.." ID="txtAddCategory" runat="server" />  
+                        <div class="vSpace5"></div>
+                        <asp:Button ID="btnAddCategory" Width="120" Height="30" Font-Size="Medium" Text="Add Category" runat="server" OnClick="btnAddCategory_Click" />
+                    </li>
+                    
                     <li class="style-1">
                         <asp:Label ID="lblCategory" runat="server" Text="Category: "></asp:Label>
                         <br />
-                        <asp:TextBox ID="txtCategory" runat="server"></asp:TextBox>
+                        <asp:DropDownList ID="ddlCategories" runat="server">
+                        </asp:DropDownList>
+                        <%--<asp:TextBox ID="txtCategory" runat="server"></asp:TextBox>--%>
                         <br />
                         <br />  
                     </li>

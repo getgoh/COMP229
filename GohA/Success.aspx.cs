@@ -19,7 +19,23 @@ public partial class Success : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         string type = Request.QueryString["type"];
-        txtMessage.InnerText = type == "add" ? "Recipe successfully added!" : "Recipe successfully deleted!";
+        string msg = "";
+        switch (type)
+        {
+            case "add":
+                msg = "Recipe successfully added!";
+                break;
+            case "delete":
+                msg = "Recipe successfully deleted!";
+                break;
+            case "update":
+                msg = "Recipe successfully updated!";
+                break;
+            default:
+                break;
+        }
+
+        txtMessage.InnerText = msg;
     }
 }
 
