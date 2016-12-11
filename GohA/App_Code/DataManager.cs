@@ -22,6 +22,51 @@ public class DataManager
         conn = new OracleConnection(connString);
     }
 
+    public User login(string username, string password)
+    {
+        User currUser = null;
+        query = "select * from RB_USER where USERNAME=:UN AND PASSWORD=:PW";
+        //query = "select * from RB_USER";
+
+        conn.Open();
+
+        cmd = new OracleCommand(query, conn);
+
+        cmd.Parameters.Add("UN", username);
+        cmd.Parameters.Add("PW", password);
+        // Enclose database code in Try-Catch-Finally
+        try
+        {
+            // Open the connection
+            //conn.Open();
+            // Execute the command
+            reader = cmd.ExecuteReader();
+
+            if (reader != null && reader.HasRows)
+            {
+                reader.Read();
+                //showMessage(reader[0].ToString() + " " + reader[1].ToString());
+
+                currUser = new User();
+                currUser.Username = reader["USERNAME"].ToString();                
+                
+            }
+
+            reader.Close();
+        }
+        catch(Exception e)
+        {
+
+        }
+        finally
+        {
+            // Close the connection
+            conn.Close();
+        }
+
+        return currUser;
+    }
+
     public int insertNewRecipe(Recipe newRecipe)
     {
         query = "RB_ADDRECIPE";
@@ -38,6 +83,7 @@ public class DataManager
         cmd.Parameters.Add("COOKINGTIME", OracleDbType.Int32).Value = newRecipe.CookingTime;
         cmd.Parameters.Add("SERVINGS", OracleDbType.Int32).Value = newRecipe.Servings;
         cmd.Parameters.Add("DESCRIPTION", OracleDbType.Varchar2).Value = newRecipe.Description;
+        cmd.Parameters.Add("IMAGEPATH", OracleDbType.Varchar2).Value = newRecipe.ImgPath;
 
         cmd.Parameters.Add("NEWID", OracleDbType.Int32).Direction = ParameterDirection.Output;
 
@@ -98,6 +144,7 @@ public class DataManager
             r.CookingTime = Convert.ToInt32(reader["COOKINGTIME"].ToString());
             r.Servings = Convert.ToInt32(reader["SERVINGS"].ToString());
             r.Description = reader["DESCRIPTION"].ToString();
+            r.ImgPath = reader["IMAGEPATH"].ToString();
 
             r.IngredientList = getIngredientsByRecipeID(r.Id);
 
@@ -189,6 +236,8 @@ public class DataManager
             r.CookingTime = Convert.ToInt32(reader["COOKINGTIME"].ToString());
             r.Servings = Convert.ToInt32(reader["SERVINGS"].ToString());
             r.Description = reader["DESCRIPTION"].ToString();
+            r.ImgPath = reader["IMAGEPATH"].ToString();
+
 
             r.IngredientList = getIngredientsByRecipeID(r.Id);
 
@@ -246,7 +295,7 @@ public class DataManager
 
         cmd = new OracleCommand(query, conn);
         cmd.Parameters.Add(new OracleParameter("recipeId", recipeId));
-
+        cmd.CommandTimeout = 30;
         reader = cmd.ExecuteReader();
 
         while (reader.Read())
@@ -259,6 +308,7 @@ public class DataManager
             r.CookingTime = Convert.ToInt32(reader["COOKINGTIME"].ToString());
             r.Servings = Convert.ToInt32(reader["SERVINGS"].ToString());
             r.Description = reader["DESCRIPTION"].ToString();
+            r.ImgPath = reader["IMAGEPATH"].ToString();
 
             r.IngredientList = getIngredientsByRecipeID(r.Id);            
         }
@@ -313,7 +363,8 @@ public class DataManager
         cmd.Parameters.Add("LV_CATEGORY", OracleDbType.Varchar2).Value = recipe.Category;
         cmd.Parameters.Add("LV_COOKINGTIME", OracleDbType.Int32).Value = recipe.CookingTime;
         cmd.Parameters.Add("LV_SERVINGS", OracleDbType.Int32).Value = recipe.Servings;
-        cmd.Parameters.Add("LV_DESCRIPTION", OracleDbType.Varchar2).Value = recipe.Description;        
+        cmd.Parameters.Add("LV_DESCRIPTION", OracleDbType.Varchar2).Value = recipe.Description;
+        cmd.Parameters.Add("LV_IMAGEPATH", OracleDbType.Varchar2).Value = recipe.ImgPath;
 
         cmd.ExecuteNonQuery();
 

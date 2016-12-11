@@ -33,6 +33,18 @@ public partial class RecipeDetails : System.Web.UI.Page
         if (currRecipe == null)
             return;
 
+        if(Session["User"] != null)
+        {
+            if(((User)Session["User"]).Username != currRecipe.SubmittedBy)
+            {
+                setEditable(false);
+            }
+        }
+        else
+        {
+            setEditable(false);
+        }
+
         if(!IsPostBack)
         {
             bindItems();
@@ -49,6 +61,17 @@ public partial class RecipeDetails : System.Web.UI.Page
         //Session["ingList"] = ingList;
     }
 
+    private void setEditable(bool canEdit)
+    {
+        if(!canEdit)        
+        {
+            btnSave.Visible = false;
+            btnAddCategory.Visible = false;
+            btnAddIngredient.Visible = false;
+            btnDelete.Visible = false;
+        }
+    }
+
     private void bindItems()
     {
         ddlCategories.DataSource = dm.getCategories();
@@ -63,6 +86,8 @@ public partial class RecipeDetails : System.Web.UI.Page
         txtCookingTime.Text = currRecipe.CookingTime.ToString();
         txtDescription.Text = currRecipe.Description;
         txtServings.Text = currRecipe.Servings.ToString();
+        imgLink.HRef = currRecipe.ImgPath;
+        img.ImageUrl = currRecipe.ImgPath;
 
         txtSubmitted.Attributes.Add("readonly", "readonly");
 
@@ -82,9 +107,6 @@ public partial class RecipeDetails : System.Web.UI.Page
             ((WUCIngredients)tempControl)._txtUnit.Text = i.Unit;
 
             ((List<Control>)Session["ingList"]).Add(tempControl);
-            //ingList.Add(tempControl);
-
-            //phIngredients.Controls.Add(tempControl);
         }
     }
 
@@ -120,6 +142,17 @@ public partial class RecipeDetails : System.Web.UI.Page
 
     protected void btnSave_Click(object sender, EventArgs e)
     {
+        string imgPath = "";
+
+        if (imgUpload.PostedFile.ContentLength > 0)
+        {
+            string fileName = imgUpload.PostedFile.FileName;
+            imgPath = "/images/" + fileName;
+            imgUpload.PostedFile.SaveAs(Server.MapPath("/images/") + fileName);
+
+            currRecipe.ImgPath = imgPath;
+        }
+
         currRecipe.Name = txtName.Text;
         currRecipe.Category = ddlCategories.SelectedValue;
         currRecipe.CookingTime = int.Parse(txtCookingTime.Text);
@@ -144,7 +177,12 @@ public partial class RecipeDetails : System.Web.UI.Page
         
         foreach (Control tempControl in ((List<Control>)Session["ingList"]))
         {
-            IngredientList.Add(new Ingredient() { Name = ((WUCIngredients)tempControl).Name, Quantity = ((WUCIngredients)tempControl).Quantity, Unit = ((WUCIngredients)tempControl).Unit });
+            if (!((WUCIngredients)tempControl)._txtName.Text.Trim().Equals("")
+             && !((WUCIngredients)tempControl)._txtQuantity.Text.Trim().Equals("")
+             && !((WUCIngredients)tempControl)._txtUnit.Text.Trim().Equals(""))
+            {
+                IngredientList.Add(new Ingredient() { Name = ((WUCIngredients)tempControl).Name, Quantity = ((WUCIngredients)tempControl).Quantity, Unit = ((WUCIngredients)tempControl).Unit });
+            }
         }
 
         return IngredientList;

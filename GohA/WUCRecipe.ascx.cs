@@ -34,4 +34,6 @@ public partial class WUCRecipe : System.Web.UI.UserControl
         set { this.txtPrepareTime.Text = "Prepare time: " + value.ToString(); }
     }
 
+    public Image _img { get { return this.img; } }
+
 }

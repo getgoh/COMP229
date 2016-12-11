@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -25,10 +26,26 @@ namespace Assignment1
             //showIngredientInputs();
         }
 
+        DataManager dm;
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            //CheckLogin("AddRecipe.aspx");
+
+            if (Session["User"] == null)
+            {
+                Session["RedirectPage"] = "AddRecipe.aspx";
+                Response.Redirect("Login.aspx");
+            }
+
+            dm = new DataManager();
+
+            txtSubmitted.Text = ((User)Session["User"]).Username;
+            txtSubmitted.Attributes["readonly"] = "readonly";
+
             if (!Page.IsPostBack)
             {
+                bindItems();
                 ingList = new List<Control>();
                 initiateIngredientInputs(3);
                 //showIngredientInputs();
@@ -41,20 +58,26 @@ namespace Assignment1
             //setTestValues();
         }
 
+        private void bindItems()
+        {
+            ddlCategories.DataSource = dm.getCategories();
+            ddlCategories.DataBind();
+        }
+
         private void setTestValues()
         {
             txtName.Text = "Adobo Test";
             txtDescription.Text = "Sample desc test";
             txtCookingTime.Text = "24";
-            txtCategory.Text = "Filipino foods";
+            //txtCategory.Text = "Filipino foods";
             txtServings.Text = "8";
             txtSubmitted.Text = "Al Test";
         }
 
         private void initiateIngredientInputs(int num)
         {
-            for(int x = 1; x <= num; x++)
-            {                
+            for (int x = 1; x <= num; x++)
+            {
                 Control tempControl = LoadControl("WUCIngredients.ascx");
                 ((WUCIngredients)tempControl).ID = "WUCIngredient" + x;
                 ((WUCIngredients)tempControl)._txtName.ID = "ingName" + x;
@@ -95,30 +118,68 @@ namespace Assignment1
             }
         }
 
+        protected void btnAddCategory_Click(object sender, EventArgs e)
+        {
+            if (txtAddCategory.Text.Trim() == "")
+            {
+                Response.Write("<script> alert('Please enter category'); </script>");
+            }
+            else
+            {
+                DataManager dm = new DataManager();
+                dm.addCategory(txtAddCategory.Text);
+                ddlCategories.DataSource = dm.getCategories();
+                ddlCategories.DataBind();
+            }
+            showIngredientInputs();
+        }
+
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
             if (Page.IsValid)
-            { 
+            {
                 Recipe newRecipe = new Recipe()
                 {
                     Name = txtName.Text,
                     SubmittedBy = txtSubmitted.Text,
-                    Category = txtCategory.Text,
+                    Category = ddlCategories.SelectedItem.Text,
+                    //Category = txtCategory.Text,
                     Servings = int.Parse(txtServings.Text),
                     CookingTime = int.Parse(txtCookingTime.Text),
                     Description = txtDescription.Text,
                     IngredientList = getIngredients()
                 };
 
+                string imgPath = "";
+                if (imgUpload.PostedFile.ContentLength > 0)
+                {
+                    string fileName = imgUpload.PostedFile.FileName;
+                    imgPath = "/images/" + fileName;
+                    imgUpload.PostedFile.SaveAs(Server.MapPath("/images/") + fileName);//Or code to save in the DataBase.
+                }
+                //if (fuImage.HasFile)
+                //{
+                //    try
+                //    {
+                //        string filename = Path.GetFileName(fuImage.FileName);
+                //        imgPath = Server.MapPath("~/images/") + filename;
+                //        fuImage.SaveAs(imgPath);
+                //    }
+                //    catch
+                //    {
+
+                //    }
+                //}
                 // add to db..
-                Response.Write("<script type='text/javascript'> alert('" + new DataManager().insertNewRecipe(newRecipe) + "'); </script>");
+                newRecipe.ImgPath = imgPath;
+                new DataManager().insertNewRecipe(newRecipe);
 
                 //((List<Recipe>)Application["RecipeList"]).Add(newRecipe);
-                                
+
                 Response.Redirect("Success.aspx?type=add");
             }
         }
-        
+
 
         private List<Ingredient> getIngredients()
         {
@@ -131,7 +192,12 @@ namespace Assignment1
             //foreach(Control tempControl in iList)
             foreach (Control tempControl in phIngredients.Controls)
             {
-                IngredientList.Add(new Ingredient() { Name = ((WUCIngredients)tempControl).Name, Quantity = ((WUCIngredients)tempControl).Quantity, Unit = ((WUCIngredients)tempControl).Unit });
+                if (!((WUCIngredients)tempControl)._txtName.Text.Trim().Equals("")
+                 && !((WUCIngredients)tempControl)._txtQuantity.Text.Trim().Equals("")
+                 && !((WUCIngredients)tempControl)._txtUnit.Text.Trim().Equals(""))
+                {
+                    IngredientList.Add(new Ingredient() { Name = ((WUCIngredients)tempControl).Name, Quantity = ((WUCIngredients)tempControl).Quantity, Unit = ((WUCIngredients)tempControl).Unit });
+                }
             }
 
             /*
@@ -163,6 +229,14 @@ namespace Assignment1
 
         protected void btnAddIngredient_Click(object sender, EventArgs e)
         {
+            //CheckLogin("Login.aspx");
+            if (Session["User"] == null)
+            {
+                Session["RedirectPage"] = "AddRecipe.aspx";
+                Response.Redirect("Login.aspx");
+            }
+
+
             int ctr = ((List<Control>)Session["ingList"]).Count + 1;
 
             Control tempControl = LoadControl("WUCIngredients.ascx");
@@ -172,7 +246,7 @@ namespace Assignment1
             ((WUCIngredients)tempControl)._txtUnit.ID = "ingUnit" + ctr;
 
             ((List<Control>)Session["ingList"]).Add(tempControl);
-            
+
             showIngredientInputs();
         }
     }

@@ -27,6 +27,7 @@ namespace Assignment1
                 ((WUCRecipe)tempControl).SubmittedBy = recipe.SubmittedBy;
                 ((WUCRecipe)tempControl).PrepareTime = recipe.CookingTime;
                 ((WUCRecipe)tempControl)._linkRecipeName.HRef = "../RecipeDetails.aspx?recipeID=" + recipe.Id;
+                ((WUCRecipe)tempControl)._img.ImageUrl = recipe.ImgPath;
                 phRecipes.Controls.Add(tempControl);
             }
         }

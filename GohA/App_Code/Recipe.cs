@@ -16,6 +16,8 @@ public class Recipe
     private int servings;
     private string description;
     List<Ingredient> ingredientList;
+
+    
     
 
     public Recipe()
@@ -32,6 +34,7 @@ public class Recipe
     public int Servings { get; set; }
     public string Description { get; set; }
     public List<Ingredient> IngredientList { get; set; }
+    public string ImgPath { get; set; }
 
 
     // Getters/Setters END //
